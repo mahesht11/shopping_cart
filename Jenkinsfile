@@ -4,7 +4,7 @@ pipeline {
     stage('git repo & clean') {
     steps {
         //bat "rmdir /s /q shopping_cart"
-        //bat "git clone https://github.com/mahesht11/shopping_cart.git"
+        bat "git clone https://github.com/mahesht11/shopping_cart.git"
         bat "mvn clean -f shopping_cart"
         }
     }
