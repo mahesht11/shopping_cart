@@ -6,13 +6,11 @@ import com.ecom.exception.ResourceNotFoundException;
 import com.ecom.exception.ResourseExistException;
 import com.ecom.repository.CategoryRepository;
 import com.ecom.service.CategoryService;
-import com.ecom.util.ModelMapperModel;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +52,8 @@ public class CategoryServiceImpl implements CategoryService{
        Optional<Category> category =  categoryRepository.findByName(name);
        if(category.isPresent()){
            return true;
+       }else {
+           return false;
        }
-        return false;
     }
 }

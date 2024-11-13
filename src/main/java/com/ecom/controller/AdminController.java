@@ -1,7 +1,6 @@
 package com.ecom.controller;
 
 import com.ecom.dto.CategoryDto;
-import com.ecom.entity.Category;
 import com.ecom.exception.ResourceNotFoundException;
 import com.ecom.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
