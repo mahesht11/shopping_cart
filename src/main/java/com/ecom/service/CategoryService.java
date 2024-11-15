@@ -12,4 +12,10 @@ public interface CategoryService {
     List<CategoryDto> getAllCategory();
 
     boolean existCategory(String name);
+
+    CategoryDto getCategory(String name);
+
+    CategoryDto updateCategory(CategoryDto categoryDto);
+
+    Boolean deleteCategory(String name);
 }
