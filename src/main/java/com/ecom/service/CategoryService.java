@@ -15,7 +15,7 @@ public interface CategoryService {
 
     CategoryDto getCategory(String name);
 
-    CategoryDto updateCategory(CategoryDto categoryDto);
+    CategoryDto updateCategory(CategoryDto categoryDto, String name);
 
     Boolean deleteCategory(String name);
 }

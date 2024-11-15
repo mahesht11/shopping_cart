@@ -73,14 +73,15 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDto updateCategory(CategoryDto categoryDto) {
+    public CategoryDto updateCategory(CategoryDto categoryDto, String name) {
         log.info("CategoryServiceImpl class updateCategory method!");
-        Optional<Category> category =  categoryRepository.findByName(categoryDto.getName().toLowerCase());
+        Optional<Category> category =  categoryRepository.findByName(name.toLowerCase());
         if(category.isPresent()){
-
         Category category1 = modelMapper.map(categoryDto, Category.class);
-        category1.setName(categoryDto.getName().toLowerCase());
-        Category updateCategory = categoryRepository.saveAndFlush(category1);
+        category.get().setName(category1.getName().toLowerCase());
+        category.get().setImageName(category1.getImageName());
+        category.get().setIsActive(category1.getIsActive());
+        Category updateCategory = categoryRepository.saveAndFlush(category.get());
         return modelMapper.map(updateCategory, CategoryDto.class);}
         else{
             throw new ResourceNotFoundException("Category is not available with this name : "+categoryDto.getName());

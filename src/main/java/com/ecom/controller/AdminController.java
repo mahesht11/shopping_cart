@@ -63,10 +63,10 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<CategoryDto> udpateCategory(@RequestBody CategoryDto categoryDto){
+    @PutMapping("/update/{name}")
+    public ResponseEntity<CategoryDto> udpateCategory(@RequestBody CategoryDto categoryDto, @PathVariable String name){
         log.info("AdminController class udpateCategory method : ");
-        CategoryDto updateCategoryDto = categoryService.updateCategory(categoryDto);
+        CategoryDto updateCategoryDto = categoryService.updateCategory(categoryDto, name);
         if(!ObjectUtils.isEmpty(updateCategoryDto)){
             return new ResponseEntity<>(updateCategoryDto, HttpStatus.FOUND);
         }else{
