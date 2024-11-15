@@ -1,7 +1,6 @@
 package com.ecom.controller;
 
 import com.ecom.dto.CategoryDto;
-import com.ecom.entity.Category;
 import com.ecom.exception.ResourceNotFoundException;
 import com.ecom.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,12 +43,45 @@ public class AdminController {
 
     @GetMapping("/category/{name}")
     public ResponseEntity<String> existCategory(@PathVariable String name){
-        log.info("AdminController class existCategory method !");
+        log.info("AdminController class existCategory method by name : "+name);
         boolean exist = categoryService.existCategory(name);
         if(ObjectUtils.isEmpty(exist)){
             return new ResponseEntity<>("Category is not exist!", HttpStatus.NOT_FOUND);
         }else{
             return new ResponseEntity<>("category is exist!", HttpStatus.FOUND);
+        }
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable  String name){
+        log.info("AdminController class getCategory method by name : "+ name);
+        CategoryDto categoryDto = categoryService.getCategory(name);
+        if(!ObjectUtils.isEmpty(categoryDto)){
+            return new ResponseEntity<>(categoryDto, HttpStatus.FOUND);
+        }else{
+            return null;
+        }
+    }
+
+    @PutMapping("/update/{name}")
+    public ResponseEntity<CategoryDto> udpateCategory(@RequestBody CategoryDto categoryDto, @PathVariable String name){
+        log.info("AdminController class udpateCategory method : ");
+        CategoryDto updateCategoryDto = categoryService.updateCategory(categoryDto, name);
+        if(!ObjectUtils.isEmpty(updateCategoryDto)){
+            return new ResponseEntity<>(updateCategoryDto, HttpStatus.FOUND);
+        }else{
+            return null;
+        }
+    }
+
+    @DeleteMapping("/{name}")
+    public ResponseEntity<String> deleteCategory(@PathVariable String name){
+        log.info("AdminController class getCategory method by name : "+ name);
+        Boolean result = categoryService.deleteCategory(name);
+        if(result){
+            return new ResponseEntity<>("Category deleted successfully!", HttpStatus.ACCEPTED);
+        }else{
+            return null;
         }
     }
 
@@ -59,4 +91,6 @@ public class AdminController {
         if(categoryDto.getImageName().isEmpty() || categoryDto.getImageName().isBlank())
             throw new ResourceNotFoundException("Category image should not be empty or blank!");
     }
+
+
 }

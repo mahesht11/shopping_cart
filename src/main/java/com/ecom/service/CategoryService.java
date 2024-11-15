@@ -1,7 +1,6 @@
 package com.ecom.service;
 
 import com.ecom.dto.CategoryDto;
-import com.ecom.entity.Category;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,4 +12,10 @@ public interface CategoryService {
     List<CategoryDto> getAllCategory();
 
     boolean existCategory(String name);
+
+    CategoryDto getCategory(String name);
+
+    CategoryDto updateCategory(CategoryDto categoryDto, String name);
+
+    Boolean deleteCategory(String name);
 }
