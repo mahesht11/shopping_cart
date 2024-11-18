@@ -23,6 +23,9 @@ public class Product {
     private Integer stock;
     private Double price;
     private String imageName;
+    private Double discountPrice;
+    private Integer discountPersentage;
+
     @ManyToOne
     @JoinColumn(name="categoryId", nullable = false)
     private Category category;

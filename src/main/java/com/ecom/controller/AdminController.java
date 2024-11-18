@@ -156,6 +156,15 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/activeProducts/{name}")
+    public ResponseEntity<List<ProductDto>> getActiveProducts(@PathVariable String name){
+        List<ProductDto> productDtoList = productService.getActiveProducts(name);
+        if(!CollectionUtils.isEmpty(productDtoList)){
+            return new ResponseEntity<>(productDtoList, HttpStatus.FOUND);
+        }
+        return null;
+    }
+
     private void validCategory(CategoryDto categoryDto) {
         if(categoryDto.getName().isEmpty() || categoryDto.getName().isBlank())
             throw new ResourceNotFoundException("Category name should not be empty or blank!");

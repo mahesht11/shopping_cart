@@ -24,9 +24,9 @@ pipeline {
             bat "mvn clean package sonar:sonar"
             }
         }
-        }
+    }
     stage('package'){
-    steps{
+        steps{
         bat "mvn package -f shopping_cart"
         }
     }

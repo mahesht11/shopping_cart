@@ -1,25 +1,34 @@
 package com.ecom.serviceimpl;
 
 import com.ecom.dto.ProductDto;
+import com.ecom.entity.Category;
 import com.ecom.entity.Product;
 import com.ecom.exception.ResourceNotFoundException;
 import com.ecom.exception.ResourseExistException;
+import com.ecom.repository.CategoryRepository;
 import com.ecom.repository.ProductRepository;
+import com.ecom.service.CategoryService;
 import com.ecom.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @Autowired
     ModelMapper mapper;
@@ -33,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
         }
         Product product = mapper.map(productDto, Product.class);
         product.setTitle(productDto.getTitle().toLowerCase());
+        product.setDiscountPrice(calculateDiscountPrice(product.getDiscountPersentage(),product.getPrice()));
         Product product1 = productRepository.saveAndFlush(product);
         return mapper.map(product1, ProductDto.class);
     }
@@ -52,44 +62,60 @@ public class ProductServiceImpl implements ProductService {
         Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
         if(product.isPresent()){
             return true;
-        }else {
-            return false;
         }
+        return false;
     }
 
     @Override
     public ProductDto getProduct(String title) {
         log.info("ProductServiceImpl class :: getProduct method :: with title : "+title);
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
-            return mapper.map(product.get(), ProductDto.class);
-        }else {
-            throw new ResourceNotFoundException("Product is not available with this title : "+title);
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+title));
+        if(!ObjectUtils.isEmpty(product)){
+            return mapper.map(product, ProductDto.class);
         }
+        return null;
     }
 
     @Override
     public ProductDto updateProduct(ProductDto productDto, String title) {
         log.info("ProductServiceImpl class :: updateProduct method!");
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+title));
+        if(!ObjectUtils.isEmpty(product)){
             Product product1 = mapper.map(productDto, Product.class);
-            Product updateProduct = productRepository.saveAndFlush(product.get());
-            return mapper.map(updateProduct, ProductDto.class);}
-        else{
-            throw new ResourceNotFoundException("Product is not available with this title : "+productDto.getTitle());
+            product.setDescription(product1.getDescription().length()>0? product1.getDescription() : product.getDescription());
+            product.setStock(product1.getStock().intValue()>0? product1.getStock() : product.getStock());
+            product.setPrice(product1.getPrice().doubleValue()>0? product1.getPrice() : product.getPrice());
+            product.setDiscountPrice(calculateDiscountPrice(product1.getDiscountPersentage(),product1.getPrice()));
+            product.setImageName(product1.getImageName().length()>0? product1.getImageName() : product.getImageName());
+            Product updateProduct = productRepository.saveAndFlush(product);
+            return mapper.map(updateProduct, ProductDto.class);
         }
+        return null;
     }
 
     @Override
     public Boolean deleteProduct(String title) {
         log.info("ProductServiceImpl class deleteProduct method with title : "+title);
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
-            productRepository.deleteById(product.get().getId());
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+title));
+        if(!ObjectUtils.isEmpty(product)){
+            productRepository.deleteById(product.getId());
             return true;
-        }else {
-            throw new ResourceNotFoundException("Product is not available with this title : "+title);
         }
+        return false;
+    }
+
+    @Override
+    public List<ProductDto> getActiveProducts(String name) {
+        log.info("ProductServiceImpl class :: getActiveProducts method! ");
+        Category category = categoryRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Category is not present with this name :"+name));
+
+        List<Product> productList = productRepository.findAllByCategory(category.getId());
+        return productList.stream().map(product -> mapper.map(product, ProductDto.class)).collect(Collectors.toList());
+    }
+
+    public Double calculateDiscountPrice(Integer discountPersentage, Double price){
+        Double discount = price*(discountPersentage/100);
+        Double discountPrice = price- discount;
+         return discountPrice;
     }
 }

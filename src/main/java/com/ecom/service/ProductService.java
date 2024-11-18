@@ -18,4 +18,6 @@ public interface ProductService {
     ProductDto updateProduct(ProductDto ProductDto, String name);
 
     Boolean deleteProduct(String name);
+
+    List<ProductDto> getActiveProducts(String name);
 }
