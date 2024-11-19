@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,36 +61,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto getProduct(String title) {
         log.info("ProductServiceImpl class :: getProduct method :: with title : "+title);
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
-            return mapper.map(product.get(), ProductDto.class);
-        }else {
-            throw new ResourceNotFoundException("Product is not available with this title : "+title);
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+title));
+        if(!ObjectUtils.isEmpty(product)){
+            return mapper.map(product, ProductDto.class);
         }
+        return null;
     }
 
     @Override
     public ProductDto updateProduct(ProductDto productDto, String title) {
         log.info("ProductServiceImpl class :: updateProduct method!");
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+productDto.getTitle()));
+        if(!ObjectUtils.isEmpty(product)) {
             Product product1 = mapper.map(productDto, Product.class);
-            Product updateProduct = productRepository.saveAndFlush(product.get());
-            return mapper.map(updateProduct, ProductDto.class);}
-        else{
-            throw new ResourceNotFoundException("Product is not available with this title : "+productDto.getTitle());
+            Product updateProduct = productRepository.saveAndFlush(product);
+            return mapper.map(updateProduct, ProductDto.class);
         }
+        return null;
     }
 
     @Override
     public Boolean deleteProduct(String title) {
         log.info("ProductServiceImpl class deleteProduct method with title : "+title);
-        Optional<Product> product =  productRepository.findByTitle(title.toLowerCase());
-        if(product.isPresent()){
-            productRepository.deleteById(product.get().getId());
+        Product product =  productRepository.findByTitle(title.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Product is not available with this title : "+title));
+        if(!ObjectUtils.isEmpty(product)){
+            productRepository.deleteById(product.getId());
             return true;
-        }else {
-            throw new ResourceNotFoundException("Product is not available with this title : "+title);
         }
+        return null;
     }
 }

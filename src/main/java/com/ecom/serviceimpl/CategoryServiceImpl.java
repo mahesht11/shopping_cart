@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -64,40 +65,36 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryDto getCategory(String name) {
         log.info("CategoryServiceImpl class getCategory method with the name : "+name);
-        Optional<Category> category =  categoryRepository.findByName(name.toLowerCase());
-        if(category.isPresent()){
-            return modelMapper.map(category.get(), CategoryDto.class);
-        }else {
-            throw new ResourceNotFoundException("Category is not available with this name : "+name);
+        Category category =  categoryRepository.findByName(name.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Category is not available with this name : "+name));
+        if(!ObjectUtils.isEmpty(category)){
+            return modelMapper.map(category, CategoryDto.class);
         }
+        return null;
     }
 
     @Override
     public CategoryDto updateCategory(CategoryDto categoryDto, String name) {
-        log.info("CategoryServiceImpl class updateCategory method!");
-        Optional<Category> category =  categoryRepository.findByName(name.toLowerCase());
-        if(category.isPresent()){
+        log.info("CategoryServiceImpl class :: updateCategory method!");
+        Category category =  categoryRepository.findByName(name.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Category is not available with this name : "+categoryDto.getName()));
+        if(!ObjectUtils.isEmpty(category)){
         Category category1 = modelMapper.map(categoryDto, Category.class);
-        category.get().setName(category1.getName().toLowerCase());
-        category.get().setImageName(category1.getImageName());
-        category.get().setIsActive(category1.getIsActive());
-        Category updateCategory = categoryRepository.saveAndFlush(category.get());
+        category.setName(category1.getName().toLowerCase());
+        category.setImageName(category1.getImageName());
+        category.setIsActive(category1.getIsActive());
+        Category updateCategory = categoryRepository.saveAndFlush(category);
         return modelMapper.map(updateCategory, CategoryDto.class);}
-        else{
-            throw new ResourceNotFoundException("Category is not available with this name : "+categoryDto.getName());
-        }
+        return null;
     }
 
     @Override
     public Boolean deleteCategory(String name) {
         log.info("CategoryServiceImpl class deleteCategory method with name : "+name);
-        Optional<Category> category =  categoryRepository.findByName(name.toLowerCase());
-        if(category.isPresent()){
-            categoryRepository.deleteById(category.get().getId());
+        Category category =  categoryRepository.findByName(name.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Category is not available with this name : "+name));
+        if(!ObjectUtils.isEmpty(category)){
+            categoryRepository.deleteById(category.getId());
             return true;
-        }else {
-            throw new ResourceNotFoundException("Category is not available with this name : "+name);
         }
+        return false;
     }
 
 
