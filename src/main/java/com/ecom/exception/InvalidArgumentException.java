@@ -2,7 +2,7 @@ package com.ecom.exception;
 
 public class InvalidArgumentException extends RuntimeException{
 
-    InvalidArgumentException(String message){
+    public InvalidArgumentException(String message){
         super(message);
     }
 }

@@ -3,6 +3,7 @@ package com.ecom.serviceimpl;
 import com.ecom.dto.ProductDto;
 import com.ecom.entity.Category;
 import com.ecom.entity.Product;
+import com.ecom.exception.InvalidArgumentException;
 import com.ecom.exception.ResourceNotFoundException;
 import com.ecom.exception.ResourseExistException;
 import com.ecom.repository.CategoryRepository;
@@ -114,6 +115,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public Double calculateDiscountPrice(Integer discountPersentage, Double price){
+        if(!(discountPersentage>=0 && discountPersentage<100))
+            throw new InvalidArgumentException("Persentage sould be greaterthan or equal to 0 or lessthan 100!");
         Double discount = price*(discountPersentage/100);
         Double discountPrice = price- discount;
          return discountPrice;
