@@ -52,7 +52,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourseExistException.class)
     public ResponseEntity<ErrorDetails> handleResourseExistException(ResourseExistException e, WebRequest request){
-        log.error("Global Exception handler : handle ResourseExistException :: " + e.getMessage());
+        log.error("Global Exception handler : handleResourseExistException :: " + e.getMessage());
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .timestamp(new Date())
+                .message(e.getMessage())
+                .details(request.getDescription(false))
+                .build();
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+
+    }
+
+    @ExceptionHandler(UserValidationException.class)
+    public ResponseEntity<ErrorDetails> handleUserValidationException(UserValidationException e, WebRequest request){
+        log.error("Global Exception handler : handleUserValidationException :: " + e.getMessage());
         ErrorDetails errorDetails = ErrorDetails.builder()
                 .timestamp(new Date())
                 .message(e.getMessage())
